@@ -1,0 +1,7 @@
+Parameters AREA
+AREA = ALLTRIM(AREA)
+*SI ESTA ABIERTO UNA AREA LA CIERRA, 
+If Used(AREA)
+	Select &AREA
+	Use
+Endif

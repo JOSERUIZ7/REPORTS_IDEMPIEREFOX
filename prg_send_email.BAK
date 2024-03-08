@@ -1,0 +1,136 @@
+
+Parameters M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.asunto
+
+#Define _CR Chr(13)+Chr(10)
+
+Pcount = 1
+If Empty(m.cReceiver)
+	m.cSender = "jose.ruiz@coposa.com"
+	m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
+	m.server = "correo.movistarcloud.com.ve"
+	m.port = 587
+	m.ssl = .T.
+	m.password = 'jr.Coposa22'
+	m.attachments = "c:\desarrollo\reports_idempierefox\ReportePlanPago.pdf"
+	m.asunto = "Reporte de Planificacion de Pago Semanal " + Alltrim(Ttoc(Datetime()))
+
+Endif
+
+
+
+
+
+m.asunto = Alltrim(m.asunto)
+m.cCad1 = m.asunto
+
+Local oSmtp
+oSmtp 			= Createobject("CsFoxySmtp")
+
+oSmtp.Server	= m.server
+oSmtp.port      = m.port   && 25 &&587 && 465  && Antonio dice: el puerto debe ser 587.
+oSmtp.ssl 		= m.ssl
+
+oSmtp.User 		= M.cSender
+oSmtp.Password 	= m.password
+
+oSmtp.From 		= M.cSender
+oSmtp.subjet 	= m.asunto   && "Asunto del Correo 1"
+oSmtp.bodyHtml  = .T.
+oSmtp.body 		= vMensaje() && "Cuerpo del mensaje de Correo"
+oSmtp.AddTo(M.cReceiver)
+oSmtp.AddAttachments(m.attachments)
+
+ON ERROR error_w("Completado" + M.cReceiver)
+If oSmtp.Smtp()
+**	Wait Windows "Correo Enviado OK" 
+	ON ERROR 
+Else
+	Messagebox(oSmtp.Error, 0+48, "Error")
+Endif
+
+
+
+
+Procedure vMensaje
+Local M.cCad
+m.cCad = ' <html> <head> <title>Enviando emails con VFP y csFoxySmtp</title> </head> <body>'
+m.cCad = M.cCad +_CR+ Repli('-',40)
+m.cCad = M.cCad +_CR+ 'Correo Enviado automaticamente por servidor de gestion de datos' + CHR(13) + CHR(13) 
+m.cCad = M.cCad +_CR+ Repli('-',40) + Chr(13)+ Chr(13)
+m.cCad = M.cCad +_CR+ 'COPOSA'
+m.cCad = M.cCad +_CR+ 'Correo: coposa@coposa.com'
+m.cCad = M.cCad +_CR+ 'Telefono: + 58 (255) 600.23.00'
+m.cCad = M.cCad +_CR+ Repli('-',40)
+m.cCad = M.cCad +_CR+ Repli('-',40)
+m.cCad = M.cCad +_CR+ "Dirección: Carretera Vía Payara, Sector Piedras Blancas, Acarigua, Estado Portuguesa."
+
+m.cCad = M.cCad +_CR+ Repli('-',40)
+m.cCad = M.cCad +_CR+ '</body> </html>'
+**--
+*Messagebox(M.cCad)
+Return Substr(M.cCad,2)
+
+
+Procedure ShowOS(M.t1)
+
+Local tt(15), _K, M.cWin
+m.tt=''  &&
+m.cWin=''  &&
+Do Case
+Case !Empty(M.t1)
+	m.cWin = M.t1
+Case !Empty(Getenv([ComSpec]))
+	m.cWin = Alltrim(Getenv([ComSpec]))
+Endcase
+
+Do Case
+Case !Empty(M.cWin) And File(M.cWin)
+** Ok...
+Case File('C:\windows\system32\win.com')
+	m.cWin = 'C:\windows\system32\win.com'
+Case File('C:\windows\system32\cmd.exe')
+	m.cWin = 'C:\windows\system32\cmd.exe'
+Endcase
+
+If !Empty(M.cWin)
+	=Agetfileversion(tt,M.cWin)
+Endif
+
+Local M.cCad2
+m.cCad2 = ''
+m.cCad2 = M.cCad2 +_CR+ M.cWin
+m.cCad2 = M.cCad2 +_CR+ 'Product Name   : '+tt(10)
+m.cCad2 = M.cCad2 +_CR+ 'File Version   : '+tt(04)
+m.cCad2 = M.cCad2 +_CR+ 'Product Version: '+tt(11)
+
+m.cCad2 = ''
+m.cCad2 = M.cCad2 +_CR+tt(10)
+m.cCad2 = M.cCad2 +_CR+tt(11)
+
+
+Return Substr(M.cCad2,2)
+Endproc
+
+
+Function GetWow64&& GetSpecialFolderPath
+Lparameters M.tnCLSIDValue
+If Pcount()=0 Or Empty( M.tnCLSIDValue)
+	m.tnCLSIDValue = 0x29
+Endif
+
+Local M.lcReturn
+
+m.lcReturn = Space(254)
+
+Declare SHGetSpecialFolderPath In SHELL32.Dll ;
+	long hwndOwner, ;
+	string @cSpecialFolderPath, ;
+	long nWhichFolder
+
+SHGetSpecialFolderPath(0, @M.lcReturn, M.tnCLSIDValue)
+
+Return M.lcReturn
+
+Endfunc && GetSpecialFolderPath
+
+**

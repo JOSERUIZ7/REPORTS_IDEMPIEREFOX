@@ -1,0 +1,5 @@
+SELECT xdefinition 
+
+loPDF = PDF3()
+
+REPORT FORM xborra.FRX OBJECT loPDF TO FILE "xborra.PDF" 

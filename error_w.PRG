@@ -1,0 +1,3 @@
+PARAMETERS  xerr
+
+WAIT WINDOW xerr TIMEOUT 2
