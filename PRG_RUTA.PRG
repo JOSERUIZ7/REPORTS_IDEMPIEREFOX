@@ -1,0 +1,16 @@
+PARAMETERS XRUTADESTINO
+
+XRUTADESTINO =Alltrim(XRUTADESTINO)
+
+XL = Len(XRUTADESTINO)
+
+If Substr(XRUTADESTINO,XL) != '\'
+	XRUTADESTINO =XRUTADESTINO +'\'
+Endif
+
+If Directory(XRUTADESTINO) = .F.
+	Wait Window 'Directorio no Existe' Nowait
+	RETURN ''
+endif
+
+RETURN XRUTADESTINO 
