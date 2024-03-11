@@ -1,6 +1,6 @@
 
-SET MESSAGE ON 
-SET NOTIFY ON 
+Set Message On
+Set Notify On
 x1 = Datetime()
 pp_termometer('10 %', 100, 10)
 Set Exclusive On
@@ -31,7 +31,7 @@ Create Cursor xdefinition (PARTNER C (50,0), COP_PAYGROUP_N C (60,0), C_INVOICE_
 	PAYMENT N (20,6), INVOICEOPEN N (20,6) , DATEINVOICED d (8,0), DUEDATE_D d (8,0), EXPIRATION_DAY I (4,0)  ,;
 	T_WEEK N (12,2), T_YEAR  N (12,2),  DATE_INI d (8,0), DATE_END d (8,0), D_WEEK C (22), CURRENCY_DET I (4,0),;
 	_a1 N (12,2) , _a2 N (12,2) , _a3 N (12,2) , _a4 N (12,2) , _a5 N (12,2) , _a6 N (12,2) , _a7 N (12,2) , _a8 N (12,2) , _a9 N (12,2) , _a10 N (12,2),;
-	_b1 C (25) , _b2 C (25), _b3 C (25) , _b4 C (25) , _b5 C (25) , _b6 C (25) , _b7 C (25) , _b8 C (25) , _b9 C (25) , _b10 C (25), c_paymentterm_n c(20))
+	_b1 C (25) , _b2 C (25), _b3 C (25) , _b4 C (25) , _b5 C (25) , _b6 C (25) , _b7 C (25) , _b8 C (25) , _b9 C (25) , _b10 C (25), c_paymentterm_n C(20))
 
 
 PRG_APPE_ACURSOR('CURSOR','xdefinition')
@@ -73,36 +73,38 @@ Endscan
 
 Select xdefinition
 Go Top
- pp_termometer('60 %', 100, 10)
+pp_termometer('60 %', 100, 10)
 
- 
+
 loPDF = PDF3()
 
-REPORT FORM ReportePlanPago.FRX OBJECT loPDF TO FILE "ReportePlanPago.PDF" 
-COPY TO reporteplanpago.xls TYPE XL5
+Report Form ReportePlanPago.FRX Object loPDF To File "ReportePlanPago.PDF"
+Copy To ReportePlanPago.Xls Type Xl5
+
+
 pp_termometer('70 %', 100, 10)
 
-	m.cSender = "jose.ruiz@coposa.com"
-	m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
-	m.server = "correo.movistarcloud.com.ve"
-	m.port = 587
-	m.ssl = .T.
-	m.password = 'jr.Coposa22'
-	xrutfile = prg_direjecutables() + 'ReportePlanPago.pdf'
-	xrutfile2 = prg_direjecutables() + 'ReportePlanPago.xls'
-	xrutfileall = '"'+ xrutfile + ' , ' + xrutfile2 + '"'
+m.cSender = "jose.ruiz@coposa.com"
+m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
+**m.cReceiver="ruizjose@gmail.com"
+m.server = "correo.movistarcloud.com.ve"
+m.port = 587
+m.ssl = .T.
+m.password = 'jr.Coposa22'
 
-	xrutfileall = '"'+ xrutfile + '"'
+xrutfile = prg_direjecutables() + 'ReportePlanPago.pdf'
+xrutfile2 = prg_direjecutables() + 'ReportePlanPago.xls'
 
-	m.attachments = xrutfile 
-	 
-	m.asunto = "Reporte de Planificacion de Pago Semanal " + Alltrim(Ttoc(Datetime()))
+m.attachments = xrutfile
+m.attachments2 = xrutfile2
+
+m.asunto = "Reporte de Planificacion de Pago Semanal " + Alltrim(Ttoc(Datetime()))
 pp_termometer('90 %', 100, 10)
 
-prg_send_email(M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.asunto)
+prg_send_email(M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.attachments2,m.asunto)
 
 pp_termometer('100 %', 100, 10)
 pp_termometer('FIN', 100, 20)
-pp_tiempo2(x1)
+prg_tiempo2(x1)
 
 **escribir en idempiere en tabla x

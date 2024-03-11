@@ -1,17 +1,22 @@
 
-Parameters M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.asunto
+Parameters M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.attachments2,m.asunto
 
 #Define _CR Chr(13)+Chr(10)
 
 Pcount = 1
 If Empty(m.cReceiver)
 	m.cSender = "jose.ruiz@coposa.com"
-	m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
+*	m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
+	m.cReceiver="ruizjose@gmail.com"
 	m.server = "correo.movistarcloud.com.ve"
 	m.port = 587
 	m.ssl = .T.
 	m.password = 'jr.Coposa22'
+*	m.AddAttachments = "c:\desarrollo\reports_idempierefox\ReportePlanPago.pdf"
+
 	m.attachments = "c:\desarrollo\reports_idempierefox\ReportePlanPago.pdf"
+	m.attachments2 = "c:\desarrollo\reports_idempierefox\ReportePlanPago.xls"
+
 	m.asunto = "Reporte de Planificacion de Pago Semanal " + Alltrim(Ttoc(Datetime()))
 
 Endif
@@ -38,12 +43,21 @@ oSmtp.subjet 	= m.asunto   && "Asunto del Correo 1"
 oSmtp.bodyHtml  = .T.
 oSmtp.body 		= vMensaje() && "Cuerpo del mensaje de Correo"
 oSmtp.AddTo(M.cReceiver)
-oSmtp.AddAttachments(m.attachments)
 
-ON ERROR error_w("Completado  " + M.cReceiver)
+If !Empty(m.attachments)
+	oSmtp.AddAttachments(m.attachments)
+Endif
+
+If !Empty(m.attachments2)
+	oSmtp.AddAttachments(m.attachments2)
+Endif
+
+
+
+On Error error_w("Completado  " + M.cReceiver)
 If oSmtp.Smtp()
-**	Wait Windows "Correo Enviado OK" 
-	ON ERROR 
+**	Wait Windows "Correo Enviado OK"
+	On Error
 Else
 	Messagebox(oSmtp.Error, 0+48, "Error")
 Endif
@@ -55,7 +69,7 @@ Procedure vMensaje
 Local M.cCad
 m.cCad = ' <html> <head> <title>Enviando emails con VFP y csFoxySmtp</title> </head> <body>'
 m.cCad = M.cCad +_CR+ Repli('-',40)
-m.cCad = M.cCad +_CR+ 'Correo Enviado automaticamente por servidor de gestion de datos' + CHR(13) + CHR(13) 
+m.cCad = M.cCad +_CR+ 'Correo Enviado automaticamente por servidor de gestion de datos' + Chr(13) + Chr(13)
 m.cCad = M.cCad +_CR+ Repli('-',40) + Chr(13)+ Chr(13)
 m.cCad = M.cCad +_CR+ 'COPOSA'
 m.cCad = M.cCad +_CR+ 'Correo: coposa@coposa.com'
