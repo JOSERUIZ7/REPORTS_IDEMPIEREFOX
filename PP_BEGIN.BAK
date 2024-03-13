@@ -3,7 +3,7 @@
  CLOSE ALL
  RELEASE ALL EXTENDED
  _SCREEN.icon = "ICONO.ICO"
- _SCREEN.caption = "REPORTES"
+ _SCREEN.caption = "Sistema de Productores Iancarina"
  _SCREEN.windowstate = 2
  _SCREEN.controlbox = .T.
  _SCREEN.closable = .F.
