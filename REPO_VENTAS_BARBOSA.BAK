@@ -2,20 +2,23 @@
 xdate = DATE()
 xprim_dia = prg_primerdiames(xdate)
 
-xd1 = ALLTRIM(STR(YEAR(xprim_dia))) + '-' + ALLTRIM(STR(MONTH(xprim_dia))) + '-' + ALLTRIM(STR(DAY(xprim_dia)))
-xd2 = ALLTRIM(STR(YEAR(xdate))) + '-' + ALLTRIM(STR(MONTH(xdate))) + '-' + ALLTRIM(STR(DAY(xdate)))
+**xd1 = ALLTRIM(STR(YEAR(xprim_dia))) + '-' + iif(LEN(ALLTRIM(STR(MONTH(xprim_dia))))=1 , "0" + ALLTRIM(STR(MONTH(xprim_dia))) , ALLTRIM(STR(MONTH(xprim_dia))) )+ '-' + ALLTRIM(STR(DAY(xprim_dia))) 
+*xd2 = ALLTRIM(STR(YEAR(xdate))) + '-' + ALLTRIM(STR(MONTH(xdate))) + '-' + ALLTRIM(STR(DAY(xdate)))
+
+xd1 = ALLTRIM(STR(YEAR(xprim_dia))) + '-' + iif(LEN(ALLTRIM(STR(MONTH(xprim_dia))))=1 , "0" + ALLTRIM(STR(MONTH(xprim_dia))) , ALLTRIM(STR(MONTH(xprim_dia))) )+ '-' + iif(LEN(ALLTRIM(STR(day(xprim_dia))))=1 , "0" + ALLTRIM(STR(day(xprim_dia))) , ALLTRIM(STR(day(xprim_dia))) )
+xd2 = ALLTRIM(STR(YEAR(xdate))) + '-' + iif(LEN(ALLTRIM(STR(MONTH(xdate))))=1 , "0" + ALLTRIM(STR(MONTH(xdate))) , ALLTRIM(STR(MONTH(xdate))) )+ '-' + iif(LEN(ALLTRIM(STR(day(xdate))))=1 , "0" + ALLTRIM(STR(day(xdate))) , ALLTRIM(STR(day(xdate))) )
 
 
 *!*	xf_ini = "'2023-08-01'" 
 *!*	xf_fin = "'2023-08-15'"
-
-xf_ini = "'" + xd1 + "'" 
-xf_fin = "'" + xd2 + "'" 
 **= "'2023-08-15'"
 
 
+xf_ini = "'" + xd1 + "'" 
+xf_fin = "'" + xd2 + "'" 
+
 A1 = " SELECT ao.name as ad_org_N,	x.typecustomer ,	x.typecustomern ,	x.value ,	x.m_product_n ,	x.qtyinvoiced , "
-A2 = " x.linenetamt_cv ,	x.tax_line_cv ,	x.total_line_cv ,	x.qty_ton ,	x.uomsymbol ,	x.nivel "
+A2 = " x.linenetamt_cv ,	x.tax_line_cv ,	x.total_line_cv ,	x.qty_ton ,	x.uomsymbol ,	x.nivel , x.doc_info"
 A3 = " from ( select a.ad_org_id,	case when A.issocialprogram = 'Y' then '2 Programa Social' "
 A4 = " when A.IsMassiveConsume = 'Y' then '1 Consumo Masivo' when A.IsIndustrialSales = 'Y' then '3 Ventas Industriales' "
 A5 = " end TypeCustomer, case when MAX(A.issocialprogram) = 'Y' then 'Programa Social' "
@@ -101,13 +104,18 @@ xsql3 = 	A1 +	A2 +	A3 +	A4 +	A5 +	A6 +	A7 +	A8 +	A9 + ;
 *!*		A60 + 	A61 +	A62 +	A63 +	A64 +	A65 +	A66 +	A67 +	A68 +	A69 + ;
 *!*		A70 + 	A71 +	A72 +	A73 +	A74 +	A75 +	A76 +	A77 +	A78 +	A79 + ;
 	A80 + 	A81 +	A82 +	A83 +	A84
-clea
 
+
+*!*	CREATE CURSOR mm2 (mm m(8))
+*!*	SELECT mm2
+*!*	APPEND BLANK 
+*!*	REPLACE mm WITH xsql3
+*!*	BROWSE
+*!*	RETURN
 
 Set Message On
 Set Notify On
 x1 = Datetime()
-*pp_termometer('10 %', 100, 10)
 Set Exclusive On
 
 
@@ -128,15 +136,9 @@ XCURSOR = 'CURSOR'
 xsql2 = xsql3
 
 *xsql2 = ' Select value,name from m_product'
-? 	xsql2
+*? 	xsql2
 
 
-*!*	CREATE CURSOR mm2 (mm m(8))
-*!*	SELECT mm2
-*!*	APPEND BLANK 
-*!*	REPLACE mm WITH xsql2
-*!*	BROWSE
-*!*	RETURN
 
 
 xresul =  PRG_OPENTABLE_NEW(XCURSOR ,xsql2)
@@ -156,7 +158,7 @@ pp_termometer('40 %', 100, 10)
 CREATE CURSOR xdefinition  (AD_ORG_N C (60,0), TYPECUSTOMER c (30) null , ;
 TYPECUSTOMERN c (20) null , VALUE c (20) null, M_PRODUCT_N c (50) null, QTYINVOICED N (20,2),;
  LINENETAMT_CV N (20,2) null, TAX_LINE_CV N (20,2) null, TOTAL_LINE_CV N (20,2) null, QTY_TON N (20,2), ;
- UOMSYMBOL c (10), NIVEL n (4,0),doc_info c(250) )
+ UOMSYMBOL c (10), NIVEL n (4,0),doc_info null c(250) )
  
 PRG_APPE_ACURSOR('CURSOR','xdefinition')
 pp_termometer('FIN', 100, 20)
@@ -185,10 +187,10 @@ Report Form ReporteVentas.FRX Object loPDF To File "ReporteVentas.PDF"
 pp_termometer('70 %', 100, 10)
 
 m.cSender = "jose.ruiz@coposa.com"
-*m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
-m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
+m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
+*m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
 
-**m.cReceiver="ruizjose@gmail.com"
+m.cReceiver="ruizjose@gmail.com"
 m.server = "correo.movistarcloud.com.ve"
 m.port = 587
 m.ssl = .T.
