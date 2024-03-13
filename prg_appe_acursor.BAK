@@ -14,7 +14,6 @@ Select &ORIGEN
 GO TOP
 Scan While .T.
 	Scatter Memvar Memo
-
 	Insert Into &DESTINO From Memvar
 Endscan
 

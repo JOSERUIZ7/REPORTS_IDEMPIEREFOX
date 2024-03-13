@@ -1,0 +1,19 @@
+ PARAMETER xf
+ xf = DATE()
+ 
+ xd = '01'
+ xm = ALLTRIM(STR(MONTH(xf)))
+ xy = ALLTRIM(STR(YEAR(xf)))
+ xd = xd+'/'+xm+'/'+xy
+ 
+ ?cTOd(xd) + 1
+ retur
+ 
+ 
+ xd = GOMONTH(CTOD(xd), 1)
+ xd = xd-1
+ IF EMPTY(xd)
+    xd = xf
+ ENDIF
+ RETURN xd
+**

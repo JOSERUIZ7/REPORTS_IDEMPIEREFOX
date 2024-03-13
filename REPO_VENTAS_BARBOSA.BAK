@@ -1,84 +1,212 @@
-A1  =  " select ao.name as ad_org_N,x.typecustomer ,x.typecustomern ,x.value ,x.m_product_n ,x.qtyinvoiced ,x.linenetamt_cv , "
-A2  =  " x.tax_line_cv ,x.total_line_cv ,x.qty_ton ,x.uomsymbol ,x.nivel from  "
-A3  =  " (select a.ad_org_id,case when A.issocialprogram = 'Y' then '2 Programa Social' when A.IsMassiveConsume = 'Y' then '1 Consumo Masivo'  "
-A4  =  " when A.IsIndustrialSales = 'Y' then '3 Ventas Industriales' end TypeCustomer,  "
-A5  =  " case when MAX(A.issocialprogram) = 'Y' then 'Programa Social' when MAX(A.IsMassiveConsume) = 'Y' then 'Consumo Masivo'  "
-A6  =  " when MAX(A.IsIndustrialSales) = 'Y' then 'Ventas Industriales' end TypeCustomerN, a.value,MAX(a.m_product_description) as m_product_n ,  "
-A7 =  " sum(a.qtyinvoiced) qtyinvoiced ,round(sum(currencyconvert(a.linenetamt, a.c_currency_id , 100, a.dateinvoiced , a.C_ConversionType_ID , a.ad_client_id, "
-A8  =  " a.ad_org_id)),2) linenetamt_cv ,round(sum(currencyConvert((a.linenetamt * (a.rate / 100::numeric)),a.c_currency_id,100,a.dateinvoiced,a.C_ConversionType_ID, "
-A9  =  " a.AD_CLIENT_ID, a.AD_ORG_ID )),2) as tax_line_cv,ROUND(sum(currencyConvert(((a.linenetamt + (a.linenetamt * (a.rate / 100::numeric)) )),a.c_currency_id,100,a.dateinvoiced, "
-A0  =  " a.C_ConversionType_ID,a.AD_CLIENT_ID,a.AD_ORG_ID )),2) as total_line_cv,( CASE WHEN MAX(a.DocBaseType) IN ('ARI','ARC') THEN 'Analisis de Ventas por Producto' " && WHEN MAX(a.DocBaseType) IN ('API','APC') THEN 'Analisis de Compras por Producto' END) REPONAME , "
-A11  =  " 'Montos expresados en: '|| max(cu.Description) || CHR(13) || 'DESDE: '|| substring('2023-08-01',9,2) || '/'|| substring('2023-08-01',6,2) ||'/'|| substring('2023-08-01',1,4) "
-A12  =  " || ' - HASTA:'|| substring('2023-08-15',9,2) || '/'|| substring('2023-08-15',6,2) ||'/'|| substring('2023-08-15',1,4) || CHR(13) ||  "
-A13  =  " case when $P{AD_Org_ID} is null then '' else ' Solo organizacion: ' || MAX(b.name) || ' - ' end ||case when $P{C_DocType_ID} is null then '' else ' Solo Documentos: ' || max(cd.name) || ' - ' end || "
-A14  =  " case when $P{C_BP_Group_ID} is null then '' else ' Solo Grupo de terceros: ' || max(bpg.name) || ' - ' end || case when $P{M_Product_Category_ID} is null then '' else ' Solo Categoria de productos: ' || max(mpc.name) || ' - ' end || "
-A15  =  " case when $P{M_Product_ID} is null then '' else ' Solo Producto: ' || max(d.name) end as doc_info,round(sum(a.qtyinvoiced)/1000,2) qty_ton,max(cum.name) UOMSymbol, 1 NIVEL "
-A16  =  " from  "
-A17  =  " cop_rv_c_invoiceline a left join m_product d on a.m_product_id = d.m_product_id join ad_org b on a.ad_org_id = b.ad_org_id join C_Currency cu on cu.c_currency_id = 100 "
-A18  =  " join c_doctype cd on a.C_DocType_ID = cd.C_DocType_ID join C_BP_Group bpg on a.C_BP_Group_ID = bpg.C_BP_Group_ID  join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id "
-A19  =  " join C_UOM cum on d.C_UOM_ID=cum.C_UOM_ID where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not NULL "
-A20  =  " and A.DOCSTATUS = 'CO' AND A.M_Product_Category_ID <> 1000064 and a.DateInvoiced between '2023-08-01' and '2023-08-15' "
-A21  =  " and a.issotrx = 'Y' and  "
-A22  =  " case when 'N' = 'N' and 'N' = 'N' and 'N' = 'N' "
-A23  =  " then ( 'Y' not in (a.IsDiscount,a.IsEndowment,a.IsDonation)) "
-A24  =  " when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'Y' "
-A25  =  " then 1=1  "
-A26  =  " when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'N' "
-A27  =  " then ( 'Y' not in (A.IsDonation)) "
-A28  =  " when 'N' = 'Y' and 'N' = 'N' and 'N' = 'N' "
-A29  =  " then ( 'Y' not in (a.IsEndowment,a.IsDonation)) "
-A30  =  " when 'N' = 'N' and 'N' = 'N' and 'N' = 'Y' "
-A31  =  " then ( 'Y' not in (a.IsDiscount,a.IsEndowment))  "
-A32  =  " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'Y' "
-A33  =  " then ( 'Y' not in (a.IsDiscount))  "
-A34  =  " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'N' "
-A35  =  " then ( 'Y' not in (a.IsDiscount,a.IsDonation))  "
-A36  =  " end and (a.C_BPartner_ID = $P{C_BPartner_ID} or $P{C_BPartner_ID} is null) and (a.AD_Org_ID = $P{AD_Org_ID} or $P{AD_Org_ID} is null) "
-A37  =  " and (a.C_BP_Group_ID = $P{C_BP_Group_ID} or $P{C_BP_Group_ID} is null) and (a.M_Product_Category_ID = $P{M_Product_Category_ID} or $P{M_Product_Category_ID} is null) "
-A38  =  " and (a.SalesRep_ID = $P{SalesRep_ID} or $P{SalesRep_ID} is null) and (a.M_Product_ID = $P{M_Product_ID} or $P{M_Product_ID} is null) "
-A39  =  " and (a.C_DocType_ID = $P{C_DocType_ID} OR $P{C_DocType_ID} IS NULL) and a.c_doctypetarget_id not in (select c_doctype_id from C_DocType where NAME like '%Débito%' or name like '%Debito%')  " &&--0401
-A40  =  " group by a.ad_org_id,TypeCustomer, a.value "
-A41  =  " union "
-A42  =  " select a.ad_org_id,case when A.issocialprogram = 'Y' then '2 Programa Social' when A.IsMassiveConsume = 'Y' then '1 Consumo Masivo'  "
-A43  =  " when A.IsIndustrialSales = 'Y' then '3 Ventas Industriales' end TypeCustomer,case when MAX(A.issocialprogram) = 'Y' then 'Programa Social'  "
-A44  =  " when MAX(A.IsMassiveConsume) = 'Y' then 'Consumo Masivo' when MAX(A.IsIndustrialSales) = 'Y' then 'Ventas Industriales' end TypeCustomerN,  "
-A45  =  " null as value,null m_product_n , sum(a.qtyinvoiced) qtyinvoiced ,null linenetamt_cv ,null tax_line_cv ,null total_line_cv ,null reponame,  "
-A46  =  " null doc_info,0 qty_ton,max(cum.name) UOMSymbol, 2 NIVEL from cop_rv_c_invoiceline a "
-A47  =  " left join m_product d on a.m_product_id = d.m_product_id join ad_org b on a.ad_org_id = b.ad_org_id "
-A48  =  " join C_Currency cu on cu.c_currency_id = 100 join c_doctype cd on a.C_DocType_ID = cd.C_DocType_ID "
-A49  =  " join C_BP_Group bpg on a.C_BP_Group_ID = bpg.C_BP_Group_ID join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id "
-A50  =  " join C_UOM cum on d.C_UOM_ID=cum.C_UOM_ID "
-A51  =  " where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not NULL and A.DOCSTATUS = 'CO' AND A.M_Product_Category_ID <> 1000064 "
-A52  =  " and a.DateInvoiced between '2023-08-01' and '2023-08-15' and a.issotrx = 'Y' "
-A53  =  " and case when 'N' = 'N' and 'N' = 'N' and 'N' = 'N' "
-A54  =  " then ( 'Y' not in (a.IsDiscount,a.IsEndowment,a.IsDonation)) when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'Y' "
-A55  =  " then 1=1 when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (A.IsDonation)) "
-A56  =  " when 'N' = 'Y' and 'N' = 'N' and 'N' = 'N' then ( 'Y' not in (a.IsEndowment,a.IsDonation)) "
-A57  =  " when 'N' = 'N' and 'N' = 'N' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount,a.IsEndowment))  " 
-A58  =  " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount))  "
-A59  =  " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (a.IsDiscount,a.IsDonation))  "
-A60  =  " end and (a.C_BPartner_ID = $P{C_BPartner_ID} or $P{C_BPartner_ID} is null) and (a.AD_Org_ID = $P{AD_Org_ID} or $P{AD_Org_ID} is null) "
-A61  =  " and (a.C_BP_Group_ID = $P{C_BP_Group_ID} or $P{C_BP_Group_ID} is null) and (a.M_Product_Category_ID = $P{M_Product_Category_ID} or $P{M_Product_Category_ID} is null) "
-A62  =  " and (a.SalesRep_ID = $P{SalesRep_ID} or $P{SalesRep_ID} is null) and (a.M_Product_ID = $P{M_Product_ID} or $P{M_Product_ID} is null) "
-A63  =  " and (a.C_DocType_ID = $P{C_DocType_ID} OR $P{C_DocType_ID} IS NULL) and a.c_doctypetarget_id not in (select c_doctype_id from C_DocType where NAME like '%Débito%' or name like '%Debito%')  " &&--0401
-A64  =  " group by a.ad_org_id,TypeCustomer,uomsymbol "
-A65  =  " union  "
-A66  =  " select a.ad_org_id, null TypeCustomer, null TypeCustomern, null as value, null m_product_n ,  sum(a.qtyinvoiced) qtyinvoiced , "
-A67  =  " null linenetamt_cv ,null tax_line_cv ,null total_line_cv ,null reponame, null doc_info, 0 qty_ton, max(cum.name) UOMSymbol, 3 NIVEL "
-A68  =  " from cop_rv_c_invoiceline a left join m_product d on a.m_product_id = d.m_product_id  join ad_org b on a.ad_org_id = b.ad_org_id "
-A69  =  " join C_Currency cu on cu.c_currency_id = 100 join c_doctype cd on a.C_DocType_ID = cd.C_DocType_ID join C_BP_Group bpg on a.C_BP_Group_ID = bpg.C_BP_Group_ID  "
-A70  =  " join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id join C_UOM cum on d.C_UOM_ID=cum.C_UOM_ID "
-A71  =  " where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not NULL and A.DOCSTATUS = 'CO' AND A.M_Product_Category_ID <> 1000064 "
-A72  =  " and a.DateInvoiced between '2023-08-01' and '2023-08-15' and a.issotrx = 'Y' "
-A73  =  " and case when 'N' = 'N' and 'N' = 'N' and 'N' = 'N' "
-A74  =  " then ( 'Y' not in (a.IsDiscount,a.IsEndowment,a.IsDonation)) when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'Y' then 1=1  "
-A75  =  " when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (A.IsDonation)) when 'N' = 'Y' and 'N' = 'N' and 'N' = 'N' "
-A76  =  " then ( 'Y' not in (a.IsEndowment,a.IsDonation)) when 'N' = 'N' and 'N' = 'N' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount,a.IsEndowment))  "
-A77  =  " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount))  when 'N' = 'N' and 'N' = 'Y' and 'N' = 'N' "
-A78  =  " then ( 'Y' not in (a.IsDiscount,a.IsDonation)) end and (a.C_BPartner_ID = $P{C_BPartner_ID} or $P{C_BPartner_ID} is null) and (a.AD_Org_ID = $P{AD_Org_ID} or $P{AD_Org_ID} is null) "
-A79  =  " and (a.C_BP_Group_ID = $P{C_BP_Group_ID} or $P{C_BP_Group_ID} is null) and (a.M_Product_Category_ID = $P{M_Product_Category_ID} or $P{M_Product_Category_ID} is null) "
-A80  =  " and (a.SalesRep_ID = $P{SalesRep_ID} or $P{SalesRep_ID} is null) and (a.M_Product_ID = $P{M_Product_ID} or $P{M_Product_ID} is null) "
-A81  =  " and (a.C_DocType_ID = $P{C_DocType_ID} OR $P{C_DocType_ID} IS NULL) and a.c_doctypetarget_id not in (select c_doctype_id from C_DocType where NAME like '%Débito%' or name like '%Debito%') "
-A82  =  " group by a.ad_org_id,uomsymbol ) as x join ad_org ao on x.ad_org_id=ao.ad_org_id where (x.TypeCustomerN = $P{TypeCustomer} or $P{TypeCustomer} is null)  "
-A83  =  " group by x.ad_org_id,ao.name,TypeCustomer,TypeCustomerN, x.value, m_product_n,qtyinvoiced,linenetamt_cv, tax_line_cv, total_line_cv, reponame, doc_info, qty_ton,uomsymbol,nivel "
-A84  =  " order by x.ad_org_id,TypeCustomer,nivel,m_product_n,uomsymbol "
+
+xdate = DATE()
+xprim_dia = prg_primerdiames(xdate)
+
+xd1 = ALLTRIM(STR(YEAR(xprim_dia))) + '-' + ALLTRIM(STR(MONTH(xprim_dia))) + '-' + ALLTRIM(STR(DAY(xprim_dia)))
+xd2 = ALLTRIM(STR(YEAR(xdate))) + '-' + ALLTRIM(STR(MONTH(xdate))) + '-' + ALLTRIM(STR(DAY(xdate)))
+
+
+*!*	xf_ini = "'2023-08-01'" 
+*!*	xf_fin = "'2023-08-15'"
+
+xf_ini = "'" + xd1 + "'" 
+xf_fin = "'" + xd2 + "'" 
+**= "'2023-08-15'"
+
+
+A1 = " SELECT ao.name as ad_org_N,	x.typecustomer ,	x.typecustomern ,	x.value ,	x.m_product_n ,	x.qtyinvoiced , "
+A2 = " x.linenetamt_cv ,	x.tax_line_cv ,	x.total_line_cv ,	x.qty_ton ,	x.uomsymbol ,	x.nivel "
+A3 = " from ( select a.ad_org_id,	case when A.issocialprogram = 'Y' then '2 Programa Social' "
+A4 = " when A.IsMassiveConsume = 'Y' then '1 Consumo Masivo' when A.IsIndustrialSales = 'Y' then '3 Ventas Industriales' "
+A5 = " end TypeCustomer, case when MAX(A.issocialprogram) = 'Y' then 'Programa Social' "
+A6 = " when MAX(A.IsMassiveConsume) = 'Y' then 'Consumo Masivo' when MAX(A.IsIndustrialSales) = 'Y' then 'Ventas Industriales' "
+A7 = " end TypeCustomerN, a.value,	MAX(a.m_product_description) as m_product_n ,sum(a.qtyinvoiced) qtyinvoiced , "
+A8 = " round(sum(currencyconvert(a.linenetamt, a.c_currency_id , 100, a.dateinvoiced , a.C_ConversionType_ID , a.ad_client_id, a.ad_org_id)), 2) linenetamt_cv , "
+A9 = " round(sum(currencyConvert((a.linenetamt * (a.rate / 100::numeric)), a.c_currency_id, 100, a.dateinvoiced, a.C_ConversionType_ID, a.AD_CLIENT_ID, a.AD_ORG_ID )), 2) as tax_line_cv, "
+A10 = " ROUND(sum(currencyConvert(((a.linenetamt + (a.linenetamt * (a.rate / 100::numeric)) )), a.c_currency_id, 100, a.dateinvoiced, a.C_ConversionType_ID, a.AD_CLIENT_ID, a.AD_ORG_ID )), 2) as total_line_cv, "
+A11 = " (case when MAX(a.DocBaseType) in ('ARI', 'ARC') then 'Analisis de Ventas por Producto' when MAX(a.DocBaseType) in ('API', 'APC') then 'Analisis de Compras por Producto' "
+A12 = " end) REPONAME ,	'Montos expresados en: ' || max(cu.Description) || CHR(13) || 'DESDE: ' || substring("
+
+a12_1 = xf_ini 
+a12_2 = ", 9, 2) || '/' || substring("
+a12_3 = xf_ini
+a12_4 = ", 6, 2) || '/' || "
+A13 = " substring("
+a13_1 = xf_ini 
+a13_2 = ", 1, 4) || ' - HASTA:' || substring("
+a13_3 = xf_fin 
+a13_4 = " , 9, 2) || '/' ||	substring("
+a13_5 = xf_fin 
+a13_6 = ", 6, 2) || '/' || substring("
+a13_7 = xf_fin 
+a13_8 = ", 1, 4)  doc_info, "
+A14 = " round(sum(a.qtyinvoiced)/ 1000, 2) qty_ton,	max(cum.name) UOMSymbol, 1 NIVEL from cop_rv_c_invoiceline a "
+A15 = " left join m_product d on a.m_product_id = d.m_product_id join ad_org b on a.ad_org_id = b.ad_org_id	join C_Currency cu on "
+A16 = " cu.c_currency_id = 100 join c_doctype cd on	a.C_DocType_ID = cd.C_DocType_ID join C_BP_Group bpg on "
+A17 = " a.C_BP_Group_ID = bpg.C_BP_Group_ID join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id "
+A18 = " join C_UOM cum on d.C_UOM_ID = cum.C_UOM_ID	where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not null and A.DOCSTATUS = 'CO' and A.M_Product_Category_ID <> 1000064 "
+A19 = " and a.DateInvoiced between "
+a19_1 = xf_ini && '2023-08-01'
+a19_2 = " and "
+a19_3 = xf_fin &&'2023-08-15' 
+A20 = " and a.issotrx = 'Y'	and	case when 'N' = 'N'	and 'N' = 'N' and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsEndowment, a.IsDonation)) "
+A21 = " when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'Y' then 1 = 1 when 'N' = 'Y' "
+A22 = " and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (A.IsDonation)) when 'N' = 'Y' and 'N' = 'N' and 'N' = 'N' then ( 'Y' not in (a.IsEndowment, a.IsDonation)) "
+A23 = " when 'N' = 'N' and 'N' = 'N' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount, a.IsEndowment)) when 'N' = 'N' and 'N' = 'Y' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount)) "
+A24 = " when 'N' = 'N' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsDonation)) end	and a.c_doctypetarget_id not in (select	c_doctype_id from C_DocType where NAME like '%Débito%' or name like '%Debito%') "
+A25 = " group by a.ad_org_id, TypeCustomer, a.value union select a.ad_org_id, case when A.issocialprogram = 'Y' then '2 Programa Social' when A.IsMassiveConsume = 'Y' then '1 Consumo Masivo' "
+A26 = " when A.IsIndustrialSales = 'Y' then '3 Ventas Industriales' end TypeCustomer, case when MAX(A.issocialprogram) = 'Y' then 'Programa Social' "
+A27 = " when MAX(A.IsMassiveConsume) = 'Y' then 'Consumo Masivo' when MAX(A.IsIndustrialSales) = 'Y' then 'Ventas Industriales' end TypeCustomerN,null as value,null m_product_n ,sum(a.qtyinvoiced) qtyinvoiced , "
+A28 = " null linenetamt_cv ,null tax_line_cv ,null total_line_cv ,null reponame,null doc_info,0 qty_ton,max(cum.name) UOMSymbol, "
+A29 = " 2 NIVEL from cop_rv_c_invoiceline a	left join m_product d on a.m_product_id = d.m_product_id	join ad_org b on a.ad_org_id = b.ad_org_id "
+A30 = " join C_Currency cu on cu.c_currency_id = 100 join c_doctype cd on a.C_DocType_ID = cd.C_DocType_ID "
+A31 = " join C_BP_Group bpg on a.C_BP_Group_ID = bpg.C_BP_Group_ID join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id "
+A32 = " join C_UOM cum on d.C_UOM_ID = cum.C_UOM_ID where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not null and A.DOCSTATUS = 'CO' "
+A33 = " and A.M_Product_Category_ID <> 1000064 and a.DateInvoiced between "
+A33_1 = xf_ini &&'2023-08-01'
+A33_2 = " and "
+A33_3 =  xf_fin &&'2023-08-15' "
+A34 = " and a.issotrx = 'Y' and	case when 'N' = 'N' and 'N' = 'N' and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsEndowment, a.IsDonation)) "
+A35 = " when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'Y' then 1 = 1 when 'N' = 'Y' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (A.IsDonation)) when 'N' = 'Y' and 'N' = 'N' "
+A36 = " and 'N' = 'N' then ( 'Y' not in (a.IsEndowment, a.IsDonation)) when 'N' = 'N' and 'N' = 'N' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount, a.IsEndowment)) when 'N' = 'N' "
+A37 = " and 'N' = 'Y' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount)) when 'N' = 'N' and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsDonation)) "
+A38 = " end and a.c_doctypetarget_id not in (select c_doctype_id from C_DocType where NAME like '%Débito%' or name like '%Debito%') group by a.ad_org_id, TypeCustomer, "
+A39 = " uomsymbol union select a.ad_org_id, null TypeCustomer,null TypeCustomern, null as value,null m_product_n ,sum(a.qtyinvoiced) qtyinvoiced ,null linenetamt_cv , "
+A40 = " null tax_line_cv ,null total_line_cv ,null reponame,null doc_info,0 qty_ton,max(cum.name) UOMSymbol,3 NIVEL	from  "
+A41 = " cop_rv_c_invoiceline a left join m_product d on a.m_product_id = d.m_product_id join ad_org b on a.ad_org_id = b.ad_org_id join C_Currency cu on cu.c_currency_id = 100 "
+A42 = " join c_doctype cd on a.C_DocType_ID = cd.C_DocType_ID join C_BP_Group bpg on a.C_BP_Group_ID = bpg.C_BP_Group_ID "
+A43 = " join M_Product_Category mpc on a.M_Product_Category_ID = mpc.M_Product_Category_id join C_UOM cum on d.C_UOM_ID = cum.C_UOM_ID where a.ad_client_id = 1000000 and A.M_PRODUCT_ID is not null "
+A44 = " and A.DOCSTATUS = 'CO' and A.M_Product_Category_ID <> 1000064 and a.DateInvoiced between "
+A44_1 = xf_ini &&'2023-08-01'
+A44_2 = " and "
+A44_3 = xf_fin &&'2023-08-15' 
+A45 = " and a.issotrx = 'Y'	and	case when 'N' = 'N' and 'N' = 'N'and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsEndowment, a.IsDonation)) "
+A46 = " when 'N' = 'Y'and 'N' = 'Y'	and 'N' = 'Y' then 1 = 1 when 'N' = 'Y'	and 'N' = 'Y' and 'N' = 'N' then ( 'Y' not in (A.IsDonation))	when 'N' = 'Y' and 'N' = 'N' and 'N' = 'N' then ( 'Y' not in (a.IsEndowment, a.IsDonation)) "
+A47 = " when 'N' = 'N' and 'N' = 'N'and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount, a.IsEndowment)) when 'N' = 'N' and 'N' = 'Y' and 'N' = 'Y' then ( 'Y' not in (a.IsDiscount))	when 'N' = 'N'and 'N' = 'Y' "
+A48 = " and 'N' = 'N' then ( 'Y' not in (a.IsDiscount, a.IsDonation)) end and a.c_doctypetarget_id not in (select c_doctype_id "
+A49 = " from C_DocType where NAME like '%Débito%' or name like '%Debito%')group by a.ad_org_id, uomsymbol) as x join ad_org ao on x.ad_org_id = ao.ad_org_id where 1=1 group by x.ad_org_id,ao.name, TypeCustomer,TypeCustomerN,x.value,m_product_n,qtyinvoiced, "
+A50 = " linenetamt_cv,tax_line_cv,total_line_cv,reponame,doc_info,qty_ton,uomsymbol,nivel order by x.ad_org_id,TypeCustomer,nivel,m_product_n,uomsymbol "
+
+
+
+xsql3 = 	A1 +	A2 +	A3 +	A4 +	A5 +	A6 +	A7 +	A8 +	A9 + ;
+	A10 +	A11 +	A12 + a12_1 + a12_2 + a12_3 + a12_4 + 	A13 + a13_1 + a13_2 + a13_3 + a13_4 + a13_5 + a13_6 + a13_7 + a13_8 + ;	
+	A14 +	A15 +	A16 +	A17 +	A18 +	A19 + a19_1 + a19_2 + a19_3 + ;
+	A20 +	A21 +	A22 +	A23 +	A24 +	A25 +	A26 +	A27 +	A28 +	A29 + ;
+	A30 + 	A31 +	A32 +	A33 + A33_1 + A33_2 + A33_3 + 	A34 +	A35 +	A36 +	A37 +	A38 +	A39 + ;
+	A40 + 	A41 +	A42 +	A43 +	A44 + A44_1 + A44_2 + A44_3+ 	A45 +	A46 +	A47 +	A48 +	A49 + A50 
+	
+	
+*!*		+ 	A51 +	A52 +	A53 +	A54 +	A55 +	A56 +	A57 +	A58 +	A59 + ;
+*!*		A60 + 	A61 +	A62 +	A63 +	A64 +	A65 +	A66 +	A67 +	A68 +	A69 + ;
+*!*		A70 + 	A71 +	A72 +	A73 +	A74 +	A75 +	A76 +	A77 +	A78 +	A79 + ;
+	A80 + 	A81 +	A82 +	A83 +	A84
+clea
+
+
+Set Message On
+Set Notify On
+x1 = Datetime()
+*pp_termometer('10 %', 100, 10)
+Set Exclusive On
+
+
+
+pp_termometer('15 %', 100, 10)
+
+Close Databases All
+XRUTA = fp_leerdsn('dsn.TXT')
+XCURSOR = 'CURSOR'
+
+?XRUTA
+?PRG_OPENCONNE_SERVER_NEW(XRUTA)
+
+*xsql2 = "select * from cop_rv_c_invoiceline "
+*!*	SELECT * FROM mm WHERE id = '8'
+*!*	xsql2 = ALLTRIM(mm)
+
+xsql2 = xsql3
+
+*xsql2 = ' Select value,name from m_product'
+? 	xsql2
+
+
+*!*	CREATE CURSOR mm2 (mm m(8))
+*!*	SELECT mm2
+*!*	APPEND BLANK 
+*!*	REPLACE mm WITH xsql2
+*!*	BROWSE
+*!*	RETURN
+
+
+xresul =  PRG_OPENTABLE_NEW(XCURSOR ,xsql2)
+SELECT &xcursor
+*BROWSE
+*?	xresul
+
+pp_termometer('40 %', 100, 10)
+
+*!*	CREATE CURSOR mm (mm m(8))
+*!*	SELECT mm
+*!*	APPEND BLANK 
+*!*	REPLACE mm WITH xsql2
+*!*	RETURN
+
+
+CREATE CURSOR xdefinition  (AD_ORG_N C (60,0), TYPECUSTOMER c (30) null , ;
+TYPECUSTOMERN c (20) null , VALUE c (20) null, M_PRODUCT_N c (50) null, QTYINVOICED N (20,2),;
+ LINENETAMT_CV N (20,2) null, TAX_LINE_CV N (20,2) null, TOTAL_LINE_CV N (20,2) null, QTY_TON N (20,2), ;
+ UOMSYMBOL c (10), NIVEL n (4,0),doc_info c(250) )
+ 
+PRG_APPE_ACURSOR('CURSOR','xdefinition')
+pp_termometer('FIN', 100, 20)
+
+
+
+
+Select  xdefinition
+*Delete For Empty(INVOICEOPEN)
+
+pp_termometer('50 %', 100, 10)
+
+Select xdefinition
+Go Top
+pp_termometer('60 %', 100, 10)
+
+Copy To ReporteVentas.Xls Type Xl5
+
+loPDF = PDF3()
+Select xdefinition
+DELETE FOR ISNULL(m_product_n)
+GO top
+Report Form ReporteVentas.FRX Object loPDF To File "ReporteVentas.PDF"
+
+
+pp_termometer('70 %', 100, 10)
+
+m.cSender = "jose.ruiz@coposa.com"
+*m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
+m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
+
+**m.cReceiver="ruizjose@gmail.com"
+m.server = "correo.movistarcloud.com.ve"
+m.port = 587
+m.ssl = .T.
+m.password = 'jr.Coposa22'
+
+xrutfile = prg_direjecutables() + 'ReporteVentas.pdf'
+xrutfile2 = prg_direjecutables() + 'ReporteVentas.xls'
+
+m.attachments = xrutfile
+m.attachments2 = xrutfile2
+
+m.asunto = "Reporte de Ventas " + Alltrim(Ttoc(Datetime()))
+pp_termometer('90 %', 100, 10)
+
+prg_send_email(M.cSender, M.cReceiver, m.server,m.port,m.ssl,m.password ,m.attachments ,m.attachments2,m.asunto)
+
+pp_termometer('100 %', 100, 10)
+pp_termometer('FIN', 100, 20)
+prg_tiempo2(x1)
+
+**escribir en idempiere en tabla x
