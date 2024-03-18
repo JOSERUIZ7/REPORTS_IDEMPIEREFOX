@@ -1,6 +1,6 @@
 
-Set Message On
-Set Notify On
+*!*	Set Message On
+*!*	Set Notify On
 x1 = Datetime()
 pp_termometer('10 %', 100, 10)
 Set Exclusive On

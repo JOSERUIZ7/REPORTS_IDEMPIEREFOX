@@ -9,13 +9,18 @@ xd1 = ALLTRIM(STR(YEAR(xprim_dia))) + '-' + iif(LEN(ALLTRIM(STR(MONTH(xprim_dia)
 xd2 = ALLTRIM(STR(YEAR(xdate))) + '-' + iif(LEN(ALLTRIM(STR(MONTH(xdate))))=1 , "0" + ALLTRIM(STR(MONTH(xdate))) , ALLTRIM(STR(MONTH(xdate))) )+ '-' + iif(LEN(ALLTRIM(STR(day(xdate))))=1 , "0" + ALLTRIM(STR(day(xdate))) , ALLTRIM(STR(day(xdate))) )
 
 
-*!*	xf_ini = "'2023-08-01'" 
-*!*	xf_fin = "'2023-08-15'"
 **= "'2023-08-15'"
 
 
 xf_ini = "'" + xd1 + "'" 
 xf_fin = "'" + xd2 + "'" 
+
+
+	xf_ini = "'2023-03-01'" 
+	xf_fin = "'2023-03-17'"
+
+?	xf_ini , 	xf_fin 
+
 
 A1 = " SELECT ao.name as ad_org_N,	x.typecustomer ,	x.typecustomern ,	x.value ,	x.m_product_n ,	x.qtyinvoiced , "
 A2 = " x.linenetamt_cv ,	x.tax_line_cv ,	x.total_line_cv ,	x.qty_ton ,	x.uomsymbol ,	x.nivel , x.doc_info"
@@ -113,12 +118,10 @@ xsql3 = 	A1 +	A2 +	A3 +	A4 +	A5 +	A6 +	A7 +	A8 +	A9 + ;
 *!*	BROWSE
 *!*	RETURN
 
-Set Message On
-Set Notify On
+*!*	Set Message On
+*!*	Set Notify On
 x1 = Datetime()
-Set Exclusive On
-
-
+*!*	Set Exclusive On
 
 pp_termometer('15 %', 100, 10)
 
@@ -126,8 +129,8 @@ Close Databases All
 XRUTA = fp_leerdsn('dsn.TXT')
 XCURSOR = 'CURSOR'
 
-?XRUTA
-?PRG_OPENCONNE_SERVER_NEW(XRUTA)
+*?XRUTA
+PRG_OPENCONNE_SERVER_NEW(XRUTA)
 
 *xsql2 = "select * from cop_rv_c_invoiceline "
 *!*	SELECT * FROM mm WHERE id = '8'
@@ -187,10 +190,10 @@ Report Form ReporteVentas.FRX Object loPDF To File "ReporteVentas.PDF"
 pp_termometer('70 %', 100, 10)
 
 m.cSender = "jose.ruiz@coposa.com"
-m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
+m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
 *m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com"
 
-m.cReceiver="ruizjose@gmail.com"
+**m.cReceiver="ruizjose@gmail.com"
 m.server = "correo.movistarcloud.com.ve"
 m.port = 587
 m.ssl = .T.

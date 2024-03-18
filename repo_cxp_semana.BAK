@@ -86,7 +86,7 @@ pp_termometer('70 %', 100, 10)
 
 m.cSender = "jose.ruiz@coposa.com"
 m.cReceiver="ruizjose@gmail.com,ana.scarabellotto@coposa.com,alejandra.alvarez@coposa.com,argelia.tarazona@coposa.com"
-m.cReceiver="ruizjose@gmail.com"
+**m.cReceiver="ruizjose@gmail.com"
 m.server = "correo.movistarcloud.com.ve"
 m.port = 587
 m.ssl = .T.
